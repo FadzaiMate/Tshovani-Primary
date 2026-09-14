@@ -25,9 +25,25 @@
         header nav { display: flex; gap: 1rem; align-items: center; }
         header nav a { color: var(--white); font-weight: 500; }
         header nav a:hover { color: var(--accent); }
+        #logout { background: transparent; border: 1.5px solid rgba(255,255,255,.4); color: var(--white); border-radius: 8px; padding: .25rem .7rem; cursor: pointer; font-size: .85rem; }
+        #logout:hover { border-color: var(--accent); color: var(--accent); }
 
         h1 { font-size: clamp(1.4rem, 3vw, 1.9rem); color: var(--primary); margin: 1.6rem 0 .2rem; }
         .sub { color: var(--muted); margin-bottom: 1.4rem; }
+        .mode-tag { display: inline-block; font-size: .78rem; font-weight: 700; padding: .15rem .7rem; border-radius: 50px; margin-left: .5rem; vertical-align: middle; }
+        .mode-live { background: #e7f2ec; color: #0b8457; }
+        .mode-local { background: #fff4d6; color: #8a6400; }
+
+        /* LOGIN GATE */
+        #login-gate { max-width: 420px; margin: 8vh auto 0; background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 2.2rem; text-align: center; }
+        #login-gate .lock { font-size: 2.6rem; }
+        #login-gate h1 { margin: .6rem 0 .4rem; }
+        #login-gate p { color: var(--muted); font-size: .92rem; margin-bottom: 1.4rem; }
+        #login-gate input { width: 100%; font: inherit; font-size: 1.3rem; text-align: center; letter-spacing: .35em; padding: .7rem; border: 2px solid #d5ddd8; border-radius: 10px; }
+        #login-gate input:focus { border-color: var(--primary); }
+        #login-gate .btn { width: 100%; margin-top: 1rem; padding: .8rem; font-size: 1rem; }
+        #login-err { color: var(--danger); font-size: .88rem; min-height: 1.2em; margin-top: .6rem; }
+        #login-gate .back { display: inline-block; margin-top: 1.2rem; font-size: .88rem; }
 
         /* STAT CARDS */
         .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
@@ -39,7 +55,7 @@
         .stat-card.good { border-top-color: #0b8457; }
         .stat-card.good b { color: #0b8457; }
 
-        /* PER-GRADE TABLE */
+        /* PANELS/TABLES */
         .panel { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.4rem; margin-bottom: 2rem; overflow-x: auto; }
         .panel h2 { color: var(--primary); font-size: 1.15rem; margin-bottom: .9rem; }
         table { border-collapse: collapse; width: 100%; font-size: .94rem; }
@@ -53,6 +69,7 @@
         .toolbar input[type="search"] { flex: 1 1 220px; max-width: 340px; padding: .55rem .8rem; border: 2px solid #d5ddd8; border-radius: 10px; font: inherit; }
         .toolbar select { padding: .5rem .7rem; border: 2px solid #d5ddd8; border-radius: 10px; font: inherit; background: #fff; }
         .btn { display: inline-block; background: var(--accent); color: var(--primary-dark); padding: .55rem 1.2rem; border-radius: 50px; font-weight: 700; border: none; cursor: pointer; font-size: .92rem; }
+        .btn:hover { transform: translateY(-1px); }
         .btn-ghost { background: #fff; border: 2px solid var(--primary); color: var(--primary); }
 
         /* APPS TABLE */
@@ -70,71 +87,165 @@
         .row-actions select { font-size: .82rem; padding: .3rem .45rem; border-radius: 8px; border: 1.5px solid #d5ddd8; }
         .row-actions button { border: 1.5px solid #d5ddd8; background: #fff; border-radius: 8px; font-size: .82rem; padding: .3rem .55rem; cursor: pointer; color: var(--danger); }
         .empty { text-align: center; color: var(--muted); padding: 2.5rem 1rem; }
+        #dash-err { color: var(--danger); font-size: .9rem; margin: .6rem 0; }
 
         footer { text-align: center; color: var(--muted); font-size: .84rem; padding: 2rem 0 2.5rem; }
 
         @media print {
-            header, .toolbar, .row-actions, footer, .no-print { display: none !important; }
+            header, .toolbar, .row-actions, footer, .no-print, #logout { display: none !important; }
             body { background: #fff; }
             .panel { box-shadow: none; border: 1px solid #ccc; }
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="brand">
-            <img src="images/child-sports.jpg" alt="">
-            Tshovani Staff
-        </div>
-        <nav>
-            <a href="index.html">Website</a>
-            <a href="enroll.html">Enroll Page</a>
-        </nav>
-    </header>
+    <!-- LOGIN GATE -->
+    <div id="login-gate">
+        <div class="lock" aria-hidden="true">🔐</div>
+        <h1>Staff Access</h1>
+        <p>Enter the office PIN to open the enrollment dashboard.<br>Ask the head teacher if you don't have it.</p>
+        <form id="login-form">
+            <input type="password" id="pin" inputmode="numeric" autocomplete="current-password"
+                   placeholder="••••" maxlength="8" aria-label="Staff PIN">
+            <button class="btn" type="submit">Open Dashboard</button>
+            <div id="login-err" role="alert"></div>
+        </form>
+        <a class="back" href="index.html">← Back to the school website</a>
+    </div>
 
-    <main class="container">
-        <h1>Enrollment Dashboard</h1>
-        <p class="sub">Applications are stored on this device (browser storage). Export to CSV regularly to keep records safe.</p>
-
-        <div class="stats-row" id="stats-row"><!-- JS --></div>
-
-        <div class="panel">
-            <h2>Places by grade</h2>
-            <table id="grade-table">
-                <thead><tr><th>Grade</th><th>Ages</th><th>Capacity</th><th>Taken</th><th>Pending</th><th>Remaining</th><th style="width:160px">Fill</th></tr></thead>
-                <tbody><!-- JS --></tbody>
-            </table>
-        </div>
-
-        <div class="panel">
-            <h2>Applications</h2>
-            <div class="toolbar">
-                <input type="search" id="q" placeholder="Search name, ref, guardian, phone…" aria-label="Search applications">
-                <select id="f-grade" aria-label="Filter by grade"><option value="">All grades</option></select>
-                <select id="f-status" aria-label="Filter by status"><option value="">All statuses</option></select>
-                <button class="btn" id="export">⬇ Export CSV</button>
-                <button class="btn btn-ghost" id="print">🖨 Print list</button>
+    <!-- DASHBOARD -->
+    <div id="dash" hidden>
+        <header>
+            <div class="brand">
+                <img src="images/child-sports.jpg" alt="">
+                Tshovani Staff
             </div>
-            <table class="apps">
-                <thead><tr><th>Ref</th><th>Learner</th><th>Grade</th><th>Guardian</th><th>Submitted</th><th>Status</th><th>Manage</th></tr></thead>
-                <tbody id="apps-body"><!-- JS --></tbody>
-            </table>
-            <div class="empty" id="empty" hidden>No applications match your filters.</div>
-        </div>
-    </main>
+            <nav>
+                <a href="index.html">Website</a>
+                <a href="enroll.html">Enroll Page</a>
+                <button id="logout" type="button">Log out</button>
+            </nav>
+        </header>
 
-    <footer>Tshovani Primary School · internal use · data stays on this device until exported</footer>
+        <main class="container">
+            <h1>Enrollment Dashboard <span id="mode-tag" class="mode-tag mode-local">checking…</span></h1>
+            <p class="sub">Applications submitted through the website. Export to CSV regularly to keep records safe.</p>
+            <div id="dash-err" role="alert"></div>
+
+            <div class="stats-row" id="stats-row"><!-- JS --></div>
+
+            <div class="panel">
+                <h2>Places by grade</h2>
+                <table id="grade-table">
+                    <thead><tr><th>Grade</th><th>Ages</th><th>Capacity</th><th>Taken</th><th>Pending</th><th>Remaining</th><th style="width:160px">Fill</th></tr></thead>
+                    <tbody><!-- JS --></tbody>
+                </table>
+            </div>
+
+            <div class="panel">
+                <h2>Applications</h2>
+                <div class="toolbar">
+                    <input type="search" id="q" placeholder="Search name, ref, guardian, phone…" aria-label="Search applications">
+                    <select id="f-grade" aria-label="Filter by grade"><option value="">All grades</option></select>
+                    <select id="f-status" aria-label="Filter by status"><option value="">All statuses</option></select>
+                    <button class="btn" id="export">⬇ Export CSV</button>
+                    <button class="btn btn-ghost" id="print">🖨 Print list</button>
+                    <button class="btn btn-ghost" id="refresh" title="Reload from server">↻ Refresh</button>
+                </div>
+                <table class="apps">
+                    <thead><tr><th>Ref</th><th>Learner</th><th>Grade</th><th>Guardian</th><th>Submitted</th><th>Status</th><th>Manage</th></tr></thead>
+                    <tbody id="apps-body"><!-- JS --></tbody>
+                </table>
+                <div class="empty" id="empty" hidden>No applications match your filters.</div>
+            </div>
+        </main>
+
+        <footer>Tshovani Primary School · internal use · <span id="foot-note"></span></footer>
+    </div>
 
     <script src="app.js"></script>
     <script>
-        TSHOVANI.seedDemo();
         const $ = id => document.getElementById(id);
+        const SESSION_KEY = 'tshovani.staff.session.v1';
+        const ADMIN_TOKEN_STORAGE = 'tshovani.admin.token.v1';
+
+        // The PIN is set per deployment via the ADMIN_PIN env var (see README).
+        // In local/no-server mode a default demo PIN keeps the dashboard usable.
+        let ADMIN_PIN = '1234'; // local default; replaced at deploy time when configured
+
+        const serverMode = () => TSHOVANI.isServer();
+
+        function setStatusTag() {
+            const tag = $('mode-tag');
+            if (serverMode()) {
+                tag.textContent = '● Live server';
+                tag.className = 'mode-tag mode-live';
+                $('foot-note').textContent = 'connected to the school database';
+            } else {
+                tag.textContent = '● Local demo mode';
+                tag.className = 'mode-tag mode-local';
+                $('foot-note').textContent = 'demo data on this device only';
+            }
+        }
+
+        // ---------- LOGIN ----------
+        function loggedIn() { return sessionStorage.getItem(SESSION_KEY) === '1'; }
+
+        $('login-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            const pin = $('pin').value.trim();
+            if (serverMode()) {
+                // Verify against the server: any authorized call returns 401 on a bad token.
+                const r = await fetch('/api/applications', { headers: { 'x-admin-token': pin } });
+                if (!r.ok) {
+                    $('login-err').textContent = 'Incorrect PIN. Try again.';
+                    return;
+                }
+                localStorage.setItem(ADMIN_TOKEN_STORAGE, pin);
+            } else if (pin !== ADMIN_PIN) {
+                $('login-err').textContent = 'Incorrect PIN. Try again.';
+                return;
+            }
+            sessionStorage.setItem(SESSION_KEY, '1');
+            openDash();
+        });
+
+        function openDash() {
+            $('login-gate').hidden = true;
+            $('dash').hidden = false;
+            renderAll();
+        }
+
+        $('logout').addEventListener('click', () => {
+            sessionStorage.removeItem(SESSION_KEY);
+            location.reload();
+        });
+
+        // ---------- RENDERING ----------
+        let cache = [];
+        let filtered = [];
+
+        async function renderAll() {
+            setStatusTag();
+            const token = localStorage.getItem(ADMIN_TOKEN_STORAGE) || '';
+            const apps = await TSHOVANI.all(token);
+            if (apps && apps.error) {
+                $('dash-err').textContent = apps.error;
+                cache = [];
+            } else {
+                $('dash-err').textContent = '';
+                cache = Array.isArray(apps) ? apps : [];
+            }
+            renderStats();
+            renderGrades();
+            renderApps();
+        }
 
         const statusOptions = TSHOVANI.STATUSES.map(s =>
             `<option value="${s}">${s[0].toUpperCase() + s.slice(1)}</option>`).join('');
 
-        function renderStats() {
-            const s = TSHOVANI.summary();
+        async function renderStats() {
+            const s = await TSHOVANI.summary(localStorage.getItem(ADMIN_TOKEN_STORAGE) || '');
             const cards = [
                 ['Total applications', s.total, ''],
                 ['Awaiting review', s.byStatus.pending, 'warn'],
@@ -146,8 +257,8 @@
                 `<div class="stat-card ${cls}"><b>${val}</b><span>${label}</span></div>`).join('');
         }
 
-        function renderGrades() {
-            const stats = TSHOVANI.gradeStats();
+        async function renderGrades() {
+            const stats = await TSHOVANI.gradeStats();
             $('grade-table').querySelector('tbody').innerHTML = stats.map(g => {
                 const pct = Math.min(100, Math.round(g.taken / g.places * 100));
                 return `<tr>
@@ -163,7 +274,7 @@
         }
 
         function appRow(a) {
-            const date = a.createdAt.slice(0, 10);
+            const date = (a.createdAt || '').slice(0, 10);
             return `<tr>
                 <td class="ref">${a.ref}</td>
                 <td class="who"><b>${a.learner.firstName} ${a.learner.lastName}</b><span>${a.learner.gender}, DOB ${a.learner.dob}${a.learner.notes ? ' · ' + a.learner.notes : ''}</span></td>
@@ -180,12 +291,11 @@
             </tr>`;
         }
 
-        let filtered = [];
         function renderApps() {
             const q = $('q').value.trim().toLowerCase();
             const fg = $('f-grade').value;
             const fs = $('f-status').value;
-            filtered = TSHOVANI.all().filter(a => {
+            filtered = cache.filter(a => {
                 if (fg && a.learner.grade !== fg) return false;
                 if (fs && a.status !== fs) return false;
                 if (q) {
@@ -193,40 +303,49 @@
                     if (!hay.includes(q)) return false;
                 }
                 return true;
-            }).sort((x, y) => y.createdAt.localeCompare(x.createdAt));
+            }).sort((x, y) => (y.createdAt || '').localeCompare(x.createdAt || ''));
 
             $('apps-body').innerHTML = filtered.map(appRow).join('');
             $('empty').hidden = filtered.length > 0;
             $('apps-body').querySelectorAll('select[data-act="status"]').forEach(sel => {
-                const app = TSHOVANI.byRef(sel.dataset.ref);
+                const app = cache.find(c => c.ref === sel.dataset.ref);
                 sel.value = app ? app.status : 'pending';
             });
         }
 
-        $('apps-body').addEventListener('change', e => {
+        $('apps-body').addEventListener('change', async e => {
             const sel = e.target.closest('select[data-act="status"]');
-            if (sel && TSHOVANI.setStatus(sel.dataset.ref, sel.value)) {
-                renderApps(); renderStats(); renderGrades();
-            }
+            if (!sel) return;
+            const ok = await TSHOVANI.setStatus(sel.dataset.ref, sel.value, localStorage.getItem(ADMIN_TOKEN_STORAGE) || '');
+            if (ok) await renderAll();
+            else alert('Could not update status. Check the PIN/connection and try again.');
         });
-        $('apps-body').addEventListener('click', e => {
+
+        $('apps-body').addEventListener('click', async e => {
             const btn = e.target.closest('button[data-act="del"]');
             if (!btn) return;
-            if (confirm(`Delete application ${btn.dataset.ref}? This cannot be undone.`)) {
-                TSHOVANI.remove(btn.dataset.ref);
-                renderApps(); renderStats(); renderGrades();
-            }
+            if (!confirm(`Delete application ${btn.dataset.ref}? This cannot be undone.`)) return;
+            const ok = await TSHOVANI.remove(btn.dataset.ref, localStorage.getItem(ADMIN_TOKEN_STORAGE) || '');
+            if (ok) await renderAll();
+            else alert('Could not delete. Check the PIN/connection and try again.');
         });
 
         ['q', 'f-grade', 'f-status'].forEach(id => $(id).addEventListener('input', renderApps));
         $('export').addEventListener('click', () => TSHOVANI.downloadCSV(filtered));
         $('print').addEventListener('click', () => window.print());
+        $('refresh').addEventListener('click', renderAll);
 
-        // init selects
+        // init filter selects
         $('f-grade').innerHTML += TSHOVANI.GRADES.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
         $('f-status').innerHTML += TSHOVANI.STATUSES.map(s => `<option value="${s}">${s[0].toUpperCase() + s.slice(1)}</option>`).join('');
 
-        renderStats(); renderGrades(); renderApps();
+        // ---------- BOOT ----------
+        (async () => {
+            await TSHOVANI.detectServer();
+            if (!serverMode()) TSHOVANI.seedDemo(); // demo rows only in local mode
+            setStatusTag();
+            if (loggedIn()) openDash();
+        })();
     </script>
 </body>
 </html>

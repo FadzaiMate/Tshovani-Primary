@@ -7,3 +7,5 @@ vercel-login.*
 # OS junk
 Thumbs.db
 desktop.ini
+
+.vercel

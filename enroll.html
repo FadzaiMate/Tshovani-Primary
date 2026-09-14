@@ -251,8 +251,8 @@
             return `<span class="pill">Open · ${g.remaining} places</span>`;
         }
 
-        function renderGrades() {
-            const stats = TSHOVANI.gradeStats();
+        async function renderGrades() {
+            const stats = await TSHOVANI.gradeStats();
             $('grades-grid').innerHTML = stats.map(g => `
                 <article class="grade-card" id="gc-${g.id}">
                     <h3>${g.name} <span class="ages">${g.ages}</span></h3>
@@ -321,7 +321,7 @@
             return errors;
         }
 
-        form.addEventListener('submit', e => {
+        form.addEventListener('submit', async e => {
             e.preventDefault();
             const d = fieldMap();
             const errors = validateForm(d);
@@ -330,7 +330,7 @@
                 document.querySelector('.field .err:not(:empty)')?.closest('.field')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 return;
             }
-            const res = TSHOVANI.createApplication(d);
+            const res = await TSHOVANI.createApplication(d);
             if (!res.ok) {
                 $('form-err').textContent = res.errors.join(' ');
                 return;

@@ -6,6 +6,20 @@ const TSHOVANI = (() => {
   const LS_KEY = 'tshovani.applications.v1';
   const SESSIONS_KEY = 'tshovani.enrollsessions.v1';
 
+  // ---- Server mode ----
+  // On the deployed site, /api exists (Vercel serverless + Supabase) and is used.
+  // Locally (no /api), everything transparently falls back to localStorage.
+  let SERVER_MODE = null; // null = unknown yet
+  async function detectServer() {
+    if (SERVER_MODE !== null) return SERVER_MODE;
+    try {
+      const r = await fetch('/api/stats', { method: 'GET' });
+      SERVER_MODE = r.ok;
+    } catch { SERVER_MODE = false; }
+    return SERVER_MODE;
+  }
+  const isServer = () => SERVER_MODE === true;
+
   const GRADES = [
     { id: 'ecd-a',  name: 'ECD A',          ages: '3–4 yrs',  fee: 20,  places: 25, desc: 'First steps: play, language and routine.' },
     { id: 'ecd-b',  name: 'ECD B',          ages: '4–5 yrs',  fee: 20,  places: 25, desc: 'School readiness through structured play.' },
@@ -37,10 +51,25 @@ const TSHOVANI = (() => {
     return `TSP-${new Date().getFullYear()}-${n}${r}`;
   }
 
-  // Create an application. Returns {ok, ref} or {ok:false, errors}
-  function createApplication(data) {
+  // Create an application. Async; returns {ok, ref} or {ok:false, errors}.
+  // In server mode it POSTs to /api/applications; otherwise saves to localStorage.
+  async function createApplication(data) {
     const errors = validate(data);
     if (errors.length) return { ok: false, errors };
+    if (await detectServer()) {
+      try {
+        const r = await fetch('/api/applications', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok || !j.ok) return { ok: false, errors: j.errors || ['The server could not save the application. Please try again.'] };
+        return { ok: true, ref: j.ref };
+      } catch {
+        return { ok: false, errors: ['Network problem — please check your connection and try again.'] };
+      }
+    }
     const app = {
       ref: refCode(),
       status: 'pending',
@@ -91,10 +120,47 @@ const TSHOVANI = (() => {
     return errors;
   }
 
-  function all() { return load(); }
+  function allLocal() { return load(); }
+
+  // Dashboard listing. Server mode: from the API (optionally with admin token).
+  async function all(adminToken) {
+    if (await detectServer()) {
+      try {
+        const r = await fetch('/api/applications', { headers: adminToken ? { 'x-admin-token': adminToken } : {} });
+        if (!r.ok) throw 0;
+        const j = await r.json();
+        return (j.applications || []).map(normalizeServerRow);
+      } catch {
+        return { error: 'Could not load applications from the server.' };
+      }
+    }
+    return allLocal();
+  }
+  function normalizeServerRow(row) {
+    return {
+      ref: row.ref,
+      status: row.status,
+      createdAt: (row.created_at || '').replace('T', ' ').slice(0, 10),
+      updatedAt: (row.updated_at || '').replace('T', ' ').slice(0, 10),
+      learner: row.learner,
+      guardian: row.guardian,
+    };
+  }
   function byRef(ref) { return load().find(a => a.ref === ref) || null; }
-  function setStatus(ref, status) {
+
+  // Status change + delete need admin rights in server mode.
+  async function setStatus(ref, status, adminToken) {
     if (!STATUSES.includes(status)) return false;
+    if (await detectServer()) {
+      try {
+        const r = await fetch('/api/applications', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken || '' },
+          body: JSON.stringify({ ref, status }),
+        });
+        return r.ok;
+      } catch { return false; }
+    }
     const list = load();
     const app = list.find(a => a.ref === ref);
     if (!app) return false;
@@ -103,12 +169,31 @@ const TSHOVANI = (() => {
     save(list);
     return true;
   }
-  function remove(ref) {
+  async function remove(ref, adminToken) {
+    if (await detectServer()) {
+      try {
+        const r = await fetch('/api/applications?ref=' + encodeURIComponent(ref), {
+          method: 'DELETE',
+          headers: { 'x-admin-token': adminToken || '' },
+        });
+        return r.ok;
+      } catch { return false; }
+    }
     save(load().filter(a => a.ref !== ref));
+    return true;
   }
 
-  // Public "how many places" view: accepted + pending count against capacity.
-  function gradeStats() {
+  // Public "how many places" view. Server mode reads live counts from /api/stats.
+  async function gradeStats() {
+    if (await detectServer()) {
+      try {
+        const r = await fetch('/api/stats');
+        if (r.ok) {
+          const j = await r.json();
+          return j.gradeStats || [];
+        }
+      } catch { /* fall through to local */ }
+    }
     const apps = load();
     return GRADES.map(g => {
       const mine = apps.filter(a => a.learner.grade === g.id);
@@ -118,7 +203,21 @@ const TSHOVANI = (() => {
     });
   }
 
-  function summary() {
+  async function summary(adminToken) {
+    if (await detectServer()) {
+      try {
+        const r = await fetch('/api/stats');
+        if (r.ok) {
+          const j = await r.json();
+          if (j.summary) {
+            // enrich with grade counts for the dashboard table
+            const byGrade = {};
+            (j.gradeStats || []).forEach(g => { byGrade[g.id] = g.taken; });
+            return { ...j.summary, byGrade };
+          }
+        }
+      } catch { /* fall through to local */ }
+    }
     const apps = load();
     const s = { total: apps.length, byStatus: {}, byGrade: {} };
     STATUSES.forEach(st => { s.byStatus[st] = apps.filter(a => a.status === st).length; });
@@ -178,5 +277,5 @@ const TSHOVANI = (() => {
     localStorage.setItem(SESSIONS_KEY, '1');
   }
 
-  return { GRADES, STATUSES, gradeById, gradeName, createApplication, validate, all, byRef, setStatus, remove, gradeStats, summary, toCSV, downloadCSV, seedDemo };
+  return { GRADES, STATUSES, gradeById, gradeName, validate, all, allLocal, byRef, setStatus, remove, gradeStats, summary, toCSV, downloadCSV, seedDemo, isServer: () => SERVER_MODE === true, detectServer };
 })();
