@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0b5d3b">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="description" content="Tshovani Primary School in Chiredzi, Zimbabwe — quality primary education for every child. ECD to Grade 7, sport, arts and a caring community.">
     <title>Tshovani Primary School | Chiredzi</title>
     <link rel="icon" href="images/child-sports.jpg">
@@ -33,6 +35,7 @@
             background: var(--bg);
             line-height: 1.65;
             -webkit-font-smoothing: antialiased;
+            -webkit-text-size-adjust: 100%;
             overflow-x: hidden;
         }
 
@@ -86,7 +89,7 @@
 
         /* HERO */
         .hero {
-            position: relative; min-height: 88vh; display: grid; place-items: center;
+            position: relative; min-height: 88vh; min-height: 88dvh; display: grid; place-items: center;
             text-align: center; color: var(--white); overflow: hidden;
         }
         .hero-bg {
@@ -264,13 +267,28 @@
             nav { display: none; width: 100%; }
             nav.open { display: block; }
             nav ul { flex-direction: column; gap: 0.2rem; padding: 0.8rem 0 0.4rem; text-align: center; }
-            nav a { display: block; padding: 0.7rem; }
+            nav a { display: block; padding: 0.85rem; font-size: 1.05rem; }
+            .menu-toggle { min-width: 48px; min-height: 48px; }
             .btn-outline { margin: 0.6rem 0 0; }
             .about-photos .ph-inset { right: 0; width: 58%; }
+            .hero-inner { padding-bottom: calc(clamp(4rem, 12vw, 6rem) + 90px); }
+            .stats-band { margin-top: -90px; }
         }
         @media (max-width: 480px) {
-            .gallery { grid-template-columns: 1fr 1fr; grid-auto-rows: 120px; }
-            .stats { padding: 1.4rem 1rem; }
+            .gallery { grid-template-columns: 1fr 1fr; grid-auto-rows: 128px; }
+            .stats { padding: 1.4rem 1rem; gap: 1.1rem 0.6rem; }
+            .hero .btn, .hero .btn-outline { display: block; width: min(320px, 100%); margin: 0 auto 0.7rem; text-align: center; }
+            .hero-badges { gap: 0.45rem; }
+            .badge { font-size: 0.8rem; padding: 0.32rem 0.8rem; }
+            .program-card .pc-body { padding: 1.2rem 1.1rem 1.3rem; }
+            .cta .btn { display: block; width: min(300px, 100%); margin: 0 auto; }
+        }
+
+        /* Touch devices: captions always visible, no hover-only affordances */
+        @media (hover: none) {
+            .gallery figcaption { opacity: 1; font-size: 0.8rem; padding: 1.4rem 0.7rem 0.6rem; }
+            .program-card, .contact-card, .grade-card { transform: none !important; }
+            .gallery img, .program-card figure img { transform: none !important; }
         }
 
         @media (prefers-reduced-motion: reduce) {

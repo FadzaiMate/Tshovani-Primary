@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#083f28">
     <meta name="description" content="Tshovani Primary School staff dashboard — enrollment applications overview and management.">
     <title>Staff Dashboard | Tshovani Primary School</title>
     <link rel="icon" href="images/child-sports.jpg">
@@ -14,7 +15,7 @@
             --danger: #b3261e;
         }
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; color: var(--text); background: var(--bg); line-height: 1.55; -webkit-font-smoothing: antialiased; }
+        body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; color: var(--text); background: var(--bg); line-height: 1.55; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%; }
         a { color: var(--primary); text-decoration: none; }
         a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 4%; }
@@ -66,7 +67,7 @@
 
         /* TOOLBAR */
         .toolbar { display: flex; gap: .8rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.1rem; }
-        .toolbar input[type="search"] { flex: 1 1 220px; max-width: 340px; padding: .55rem .8rem; border: 2px solid #d5ddd8; border-radius: 10px; font: inherit; }
+        .toolbar input[type="search"] { flex: 1 1 220px; max-width: 340px; padding: .65rem .85rem; border: 2px solid #d5ddd8; border-radius: 10px; font: inherit; min-height: 48px; }
         .toolbar select { padding: .5rem .7rem; border: 2px solid #d5ddd8; border-radius: 10px; font: inherit; background: #fff; }
         .btn { display: inline-block; background: var(--accent); color: var(--primary-dark); padding: .55rem 1.2rem; border-radius: 50px; font-weight: 700; border: none; cursor: pointer; font-size: .92rem; }
         .btn:hover { transform: translateY(-1px); }
@@ -90,6 +91,19 @@
         #dash-err { color: var(--danger); font-size: .9rem; margin: .6rem 0; }
 
         footer { text-align: center; color: var(--muted); font-size: .84rem; padding: 2rem 0 2.5rem; }
+
+        @media (max-width: 640px) {
+            .toolbar input[type="search"] { max-width: none; flex-basis: 100%; }
+            .toolbar select { flex: 1 1 40%; min-height: 48px; }
+            .toolbar .btn { flex: 1 1 45%; text-align: center; padding: .7rem .5rem; min-height: 48px; }
+            .stats-row { grid-template-columns: 1fr 1fr; gap: .7rem; }
+            .stat-card { padding: .9rem .8rem; }
+            .stat-card b { font-size: 1.5rem; }
+            h1 { font-size: 1.35rem; }
+            .panel { padding: 1rem .8rem; }
+            th, td { padding: .5rem .5rem; }
+            #login-gate { margin: 5vh 5% 0; }
+        }
 
         @media print {
             header, .toolbar, .row-actions, footer, .no-print, #logout { display: none !important; }
