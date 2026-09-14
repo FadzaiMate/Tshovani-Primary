@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Enroll your child at Tshovani Primary School, Chiredzi — choose a grade from ECD A to Grade 7 and apply online.">
+    <title>Enroll Online | Tshovani Primary School</title>
+    <link rel="icon" href="images/child-sports.jpg">
+    <style>
+        :root {
+            --primary: #0b5d3b; --primary-dark: #083f28; --accent: #f4b400;
+            --text: #2b2f2d; --muted: #5d6662; --bg: #f6f8f6; --white: #fff;
+            --radius: 14px; --shadow: 0 10px 30px rgba(8,63,40,.10); --shadow-lg: 0 24px 60px rgba(8,63,40,.18);
+            --danger: #b3261e; --ok: #0b5d3b;
+        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+        body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; color: var(--text); background: var(--bg); line-height: 1.65; -webkit-font-smoothing: antialiased; }
+        img { max-width: 100%; display: block; }
+        a { color: var(--primary); text-decoration: none; }
+        a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 5%; }
+
+        header { position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: .8rem 5%; background: rgba(11,93,59,.95); color: var(--white); box-shadow: 0 2px 14px rgba(0,0,0,.18); }
+        .logo { display: flex; align-items: center; gap: .7rem; font-weight: 700; color: var(--white); }
+        .logo-mark { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent); }
+        header .hlinks { display: flex; gap: 1.2rem; align-items: center; flex-wrap: wrap; }
+        header .hlinks a { color: var(--white); font-weight: 500; }
+        header .hlinks a:hover { color: var(--accent); }
+
+        .page-head { background: linear-gradient(120deg, var(--primary), var(--primary-dark)); color: var(--white); text-align: center; padding: clamp(2.5rem, 6vw, 4rem) 5% clamp(2rem, 5vw, 3rem); }
+        .page-head h1 { font-size: clamp(1.8rem, 4.5vw, 2.6rem); margin-bottom: .5rem; }
+        .page-head p { opacity: .93; max-width: 640px; margin: 0 auto; }
+
+        section { padding: clamp(2.2rem, 5vw, 3.6rem) 0; }
+        .section-title { font-size: clamp(1.5rem, 3.4vw, 2rem); color: var(--primary); text-align: center; margin-bottom: .5rem; }
+        .section-title::after { content: ""; display: block; width: 60px; height: 4px; background: var(--accent); margin: .7rem auto 0; border-radius: 2px; }
+        .section-sub { text-align: center; color: var(--muted); max-width: 620px; margin: 0 auto 2.2rem; }
+
+        /* GRADES OVERVIEW */
+        .grades-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); gap: 1.1rem; }
+        .grade-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.3rem 1.2rem 1.2rem; display: flex; flex-direction: column; gap: .4rem; border-top: 4px solid var(--primary); transition: transform .2s ease, box-shadow .2s ease; }
+        .grade-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+        .grade-card h3 { color: var(--primary); font-size: 1.15rem; display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; }
+        .grade-card .ages { color: var(--muted); font-size: .85rem; }
+        .grade-card p { color: var(--muted); font-size: .92rem; flex: 1; }
+        .pill { display: inline-block; font-size: .75rem; font-weight: 700; padding: .18rem .6rem; border-radius: 50px; background: #e7f2ec; color: var(--primary); }
+        .pill.full { background: #fdeaea; color: #9c1c14; }
+        .pill.low { background: #fff4d6; color: #8a6400; }
+        .grade-card .fee { font-size: .85rem; color: var(--muted); }
+        .grade-card .pick { margin-top: .5rem; background: var(--accent); color: var(--primary-dark); font-weight: 700; border: none; border-radius: 50px; padding: .5rem 1rem; cursor: pointer; transition: transform .15s ease; }
+        .grade-card .pick:hover { transform: translateY(-2px); }
+
+        /* FORM */
+        .form-wrap { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow-lg); padding: clamp(1.4rem, 4vw, 2.4rem); max-width: 860px; margin: 0 auto; }
+        fieldset { border: none; margin-bottom: 1.6rem; }
+        legend { font-weight: 700; color: var(--primary); margin-bottom: .8rem; font-size: 1.05rem; }
+        .frow { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .field { display: flex; flex-direction: column; gap: .3rem; margin-bottom: 1rem; }
+        .field.full { grid-column: 1 / -1; }
+        label { font-weight: 600; font-size: .92rem; }
+        label .req { color: var(--danger); }
+        input, select, textarea { font: inherit; padding: .65rem .8rem; border: 2px solid #d5ddd8; border-radius: 10px; background: #fbfdfc; width: 100%; }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+        .hint { font-size: .8rem; color: var(--muted); }
+        .err { color: var(--danger); font-size: .84rem; min-height: 1.1em; }
+        .actions { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+        .btn { display: inline-block; background: var(--accent); color: var(--primary-dark); padding: .85rem 2rem; border-radius: 50px; font-weight: 700; border: none; cursor: pointer; font-size: 1rem; transition: transform .15s ease, box-shadow .15s ease; box-shadow: 0 8px 22px rgba(244,180,0,.35); }
+        .btn:hover { transform: translateY(-2px); }
+        .btn-ghost { background: transparent; border: 2px solid var(--primary); color: var(--primary); box-shadow: none; }
+        .agree { display: flex; gap: .6rem; align-items: flex-start; font-size: .9rem; color: var(--muted); }
+        .agree input { width: auto; margin-top: .3rem; }
+
+        /* CONFIRMATION */
+        .confirm { text-align: center; padding: clamp(2rem, 6vw, 3.4rem) 1.2rem; }
+        .confirm .tick { width: 84px; height: 84px; margin: 0 auto 1.2rem; border-radius: 50%; background: #e7f2ec; display: grid; place-items: center; font-size: 2.6rem; color: var(--ok); }
+        .confirm h2 { color: var(--primary); margin-bottom: .6rem; font-size: 1.6rem; }
+        .confirm .ref { font-size: 1.25rem; font-weight: 800; letter-spacing: .06em; background: #fff8e1; border: 2px dashed var(--accent); display: inline-block; padding: .5rem 1.4rem; border-radius: 12px; margin: .8rem 0 1.2rem; }
+        .confirm p { color: var(--muted); max-width: 520px; margin: 0 auto 1.6rem; }
+
+        footer { background: var(--primary-dark); color: rgba(255,255,255,.85); text-align: center; padding: 1.8rem 5%; font-size: .88rem; }
+        footer a { color: var(--accent); }
+
+        @media (max-width: 640px) {
+            .frow { grid-template-columns: 1fr; }
+            header .hlinks a.hide-s { display: none; }
+        }
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; scroll-behavior: auto !important; } }
+    </style>
+</head>
+<body>
+    <header>
+        <a class="logo" href="index.html">
+            <img class="logo-mark" src="images/child-sports.jpg" alt="">
+            Tshovani Primary School
+        </a>
+        <div class="hlinks">
+            <a class="hide-s" href="index.html">Home</a>
+            <a class="hide-s" href="index.html#programs">Programs</a>
+            <a href="admin.html">Staff Login</a>
+        </div>
+    </header>
+
+    <div class="page-head">
+        <h1>Enroll for Any Grade</h1>
+        <p>Choose a grade below to see places, then complete the online application. It takes about 5 minutes.</p>
+    </div>
+
+    <main>
+        <!-- GRADES OVERVIEW -->
+        <section id="grades">
+            <div class="container">
+                <h2 class="section-title">Grade Overview</h2>
+                <p class="section-sub">Live view of places per grade. <span class="pill">Open</span> means places remain, <span class="pill low">Filling fast</span> means 5 or fewer, and <span class="pill full">Full</span> joins the waitlist.</p>
+                <div class="grades-grid" id="grades-grid"><!-- built by JS --></div>
+            </div>
+        </section>
+
+        <!-- APPLICATION FORM -->
+        <section id="apply">
+            <div class="container">
+                <h2 class="section-title">Application Form</h2>
+                <p class="section-sub">Fields marked <span style="color:var(--danger)">*</span> are required.</p>
+
+                <div class="form-wrap">
+                    <form id="enroll-form" novalidate>
+                        <fieldset>
+                            <legend>1 · Learner details</legend>
+                            <div class="frow">
+                                <div class="field">
+                                    <label for="firstName">First name <span class="req">*</span></label>
+                                    <input id="firstName" name="firstName" autocomplete="given-name" required>
+                                    <div class="err" data-err></div>
+                                </div>
+                                <div class="field">
+                                    <label for="lastName">Surname <span class="req">*</span></label>
+                                    <input id="lastName" name="lastName" autocomplete="family-name" required>
+                                    <div class="err" data-err></div>
+                                </div>
+                                <div class="field">
+                                    <label for="dob">Date of birth <span class="req">*</span></label>
+                                    <input id="dob" name="dob" type="date" required>
+                                    <div class="hint">Used to confirm the right grade placement.</div>
+                                    <div class="err" data-err></div>
+                                </div>
+                                <div class="field">
+                                    <label for="gender">Gender <span class="req">*</span></label>
+                                    <select id="gender" name="gender" required>
+                                        <option value="">Select…</option>
+                                        <option value="female">Female</option>
+                                        <option value="male">Male</option>
+                                    </select>
+                                    <div class="err" data-err></div>
+                                </div>
+                                <div class="field full">
+                                    <label for="grade">Applying for grade <span class="req">*</span></label>
+                                    <select id="grade" name="grade" required>
+                                        <option value="">Select a grade…</option>
+                                    </select>
+                                    <div class="err" data-err></div>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <fieldset>
+                            <legend>2 · Parent / Guardian</legend>
+                            <div class="frow">
+                                <div class="field">
+                                    <label for="guardianName">Full name <span class="req">*</span></label>
+                                    <input id="guardianName" name="guardianName" autocomplete="name" required>
+                                    <div class="err" data-err></div>
+                                </div>
+                                <div class="field">
+                                    <label for="relation">Relationship <span class="req">*</span></label>
+                                    <select id="relation" name="relation" required>
+                                        <option value="">Select…</option>
+                                        <option value="parent">Parent</option>
+                                        <option value="guardian">Guardian</option>
+                                        <option value="other">Other family member</option>
+                                    </select>
+                                    <div class="err" data-err></div>
+                                </div>
+                                <div class="field">
+                                    <label for="phone">Phone / WhatsApp <span class="req">*</span></label>
+                                    <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+263 77 000 0000" required>
+                                    <div class="err" data-err></div>
+                                </div>
+                                <div class="field">
+                                    <label for="email">Email <span class="hint">(optional)</span></label>
+                                    <input id="email" name="email" type="email" autocomplete="email">
+                                    <div class="err" data-err></div>
+                                </div>
+                                <div class="field full">
+                                    <label for="notes">Anything we should know? <span class="hint">(optional)</span></label>
+                                    <textarea id="notes" name="notes" rows="3" placeholder="Allergies, transfer from another school, siblings already with us…"></textarea>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <fieldset>
+                            <legend>3 · Confirm</legend>
+                            <div class="field">
+                                <div class="agree">
+                                    <input type="checkbox" id="agree" required>
+                                    <label for="agree">I confirm the information given is true, and I understand this online form is an application — the school office will contact me to complete enrollment. <span class="req">*</span></label>
+                                </div>
+                                <div class="err" data-err></div>
+                            </div>
+                        </fieldset>
+
+                        <div class="actions">
+                            <button type="submit" class="btn">Submit Application</button>
+                            <a href="#grades" class="btn btn-ghost">Back to grades</a>
+                            <span class="err" id="form-err" role="alert" style="margin-left:.4rem"></span>
+                        </div>
+                    </form>
+
+                    <!-- CONFIRMATION -->
+                    <div id="confirm-box" class="confirm" hidden>
+                        <div class="tick" aria-hidden="true">✓</div>
+                        <h2>Application received!</h2>
+                        <div class="ref" id="confirm-ref"></div>
+                        <p id="confirm-detail"></p>
+                        <p>Please write down or screenshot your reference number. The office will call you on the number provided.</p>
+                        <div class="actions" style="justify-content:center">
+                            <a class="btn" href="index.html">Back to Home</a>
+                            <button class="btn btn-ghost" id="another" type="button">Enroll another child</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© <span id="year"></span> Tshovani Primary School, Chiredzi · <a href="index.html">Home</a> · <a href="admin.html">Staff Login</a></p>
+    </footer>
+
+    <script src="app.js"></script>
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        const $ = id => document.getElementById(id);
+        const form = $('enroll-form');
+        const gradeSel = $('grade');
+
+        // Build grade <select> and overview cards
+        function gradePill(g) {
+            if (g.remaining <= 0) return '<span class="pill full">Full — waitlist</span>';
+            if (g.remaining <= 5) return `<span class="pill low">Filling fast · ${g.remaining} left</span>`;
+            return `<span class="pill">Open · ${g.remaining} places</span>`;
+        }
+
+        function renderGrades() {
+            const stats = TSHOVANI.gradeStats();
+            $('grades-grid').innerHTML = stats.map(g => `
+                <article class="grade-card" id="gc-${g.id}">
+                    <h3>${g.name} <span class="ages">${g.ages}</span></h3>
+                    <div>${gradePill(g)}</div>
+                    <p>${g.desc}</p>
+                    <div class="fee">Levies from US$${g.fee}/term</div>
+                    <button class="pick" data-grade="${g.id}">Enroll for ${g.name}</button>
+                </article>
+            `).join('');
+        }
+
+        function renderGradeOptions() {
+            gradeSel.innerHTML = '<option value="">Select a grade…</option>' +
+                TSHOVANI.GRADES.map(g => `<option value="${g.id}">${g.name} (${g.ages})</option>`).join('');
+        }
+
+        // Preselect grade when a card button is clicked
+        document.addEventListener('click', e => {
+            const btn = e.target.closest('.pick');
+            if (!btn) return;
+            gradeSel.value = btn.dataset.grade;
+            document.getElementById('apply').scrollIntoView({ behavior: 'smooth' });
+            setTimeout(() => $('firstName').focus({ preventScroll: true }), 450);
+        });
+
+        // Per-field inline errors
+        function setErr(el, msg) {
+            const wrap = el.closest('.field');
+            const box = wrap && wrap.querySelector('[data-err]');
+            if (box) box.textContent = msg || '';
+        }
+        function clearErrors() {
+            document.querySelectorAll('[data-err]').forEach(b => b.textContent = '');
+            $('form-err').textContent = '';
+        }
+        function fieldMap() {
+            const d = {};
+            ['firstName','lastName','dob','gender','grade','guardianName','relation','phone','email','notes'].forEach(n => d[n] = ($(n).value || '').trim());
+            d.agree = $('agree').checked;
+            return d;
+        }
+
+        function validateForm(d) {
+            const errors = TSHOVANI.validate(d);
+            if (!d.agree) errors.push('Please confirm the declaration to submit.');
+            const map = {
+                'Learner first name is required.': 'firstName',
+                'Learner surname is required.': 'lastName',
+                'Date of birth is required.': 'dob',
+                'Date of birth is not a valid date.': 'dob',
+                'Age must be between 3 and 15 years.': 'dob',
+                'Please choose a grade.': 'grade',
+                'Please choose a gender.': 'gender',
+                'Parent/Guardian name is required.': 'guardianName',
+                'Contact phone is required.': 'phone',
+                'Phone number looks invalid.': 'phone',
+                'Email address looks invalid.': 'email',
+                'Please say how you are related to the learner.': 'relation',
+            };
+            clearErrors();
+            errors.forEach(msg => {
+                const id = map[msg];
+                if (id) setErr($(id), msg);
+                else if (msg.startsWith('Please confirm')) setErr($('agree'), msg);
+            });
+            return errors;
+        }
+
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            const d = fieldMap();
+            const errors = validateForm(d);
+            if (errors.length) {
+                $('form-err').textContent = 'Please fix the highlighted fields.';
+                document.querySelector('.field .err:not(:empty)')?.closest('.field')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+            const res = TSHOVANI.createApplication(d);
+            if (!res.ok) {
+                $('form-err').textContent = res.errors.join(' ');
+                return;
+            }
+            const g = TSHOVANI.gradeById(d.grade);
+            $('confirm-ref').textContent = res.ref;
+            $('confirm-detail').textContent = `${d.firstName} ${d.lastName} — application for ${g.name} received. `;
+            form.hidden = true;
+            $('confirm-box').hidden = false;
+            renderGrades(); // refresh place counts
+            window.scrollTo({ top: $('confirm-box').offsetTop - 140, behavior: 'smooth' });
+        });
+
+        $('another').addEventListener('click', () => {
+            form.reset();
+            form.hidden = false;
+            $('confirm-box').hidden = true;
+            clearErrors();
+            $('firstName').focus();
+        });
+
+        renderGradeOptions();
+        renderGrades();
+    </script>
+</body>
+</html>

@@ -1,6 +1,9 @@
 # Freebuff workspace metadata
 .freebuff/
 
+# Vercel CLI login scratch files
+vercel-login.*
+
 # OS junk
 Thumbs.db
 desktop.ini

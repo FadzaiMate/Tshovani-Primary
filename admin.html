@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Tshovani Primary School staff dashboard — enrollment applications overview and management.">
+    <title>Staff Dashboard | Tshovani Primary School</title>
+    <link rel="icon" href="images/child-sports.jpg">
+    <style>
+        :root {
+            --primary: #0b5d3b; --primary-dark: #083f28; --accent: #f4b400;
+            --text: #2b2f2d; --muted: #5d6662; --bg: #f3f6f4; --white: #fff;
+            --radius: 14px; --shadow: 0 10px 30px rgba(8,63,40,.10);
+            --danger: #b3261e;
+        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; color: var(--text); background: var(--bg); line-height: 1.55; -webkit-font-smoothing: antialiased; }
+        a { color: var(--primary); text-decoration: none; }
+        a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 4%; }
+
+        header { background: var(--primary-dark); color: var(--white); padding: .8rem 4%; display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; position: sticky; top: 0; z-index: 50; }
+        .brand { display: flex; align-items: center; gap: .6rem; font-weight: 700; }
+        .brand img { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); }
+        header nav { display: flex; gap: 1rem; align-items: center; }
+        header nav a { color: var(--white); font-weight: 500; }
+        header nav a:hover { color: var(--accent); }
+
+        h1 { font-size: clamp(1.4rem, 3vw, 1.9rem); color: var(--primary); margin: 1.6rem 0 .2rem; }
+        .sub { color: var(--muted); margin-bottom: 1.4rem; }
+
+        /* STAT CARDS */
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.1rem 1.2rem; border-top: 4px solid var(--primary); }
+        .stat-card b { display: block; font-size: 1.9rem; color: var(--primary); line-height: 1.15; }
+        .stat-card span { color: var(--muted); font-size: .88rem; font-weight: 500; }
+        .stat-card.warn { border-top-color: var(--accent); }
+        .stat-card.warn b { color: #8a6400; }
+        .stat-card.good { border-top-color: #0b8457; }
+        .stat-card.good b { color: #0b8457; }
+
+        /* PER-GRADE TABLE */
+        .panel { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.4rem; margin-bottom: 2rem; overflow-x: auto; }
+        .panel h2 { color: var(--primary); font-size: 1.15rem; margin-bottom: .9rem; }
+        table { border-collapse: collapse; width: 100%; font-size: .94rem; }
+        th, td { text-align: left; padding: .55rem .7rem; border-bottom: 1px solid #e4eae6; white-space: nowrap; }
+        th { color: var(--muted); font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; }
+        td .bar { height: 8px; background: #e4eae6; border-radius: 4px; min-width: 90px; position: relative; display: block; }
+        td .bar i { position: absolute; inset: 0 auto 0 0; background: var(--primary); border-radius: 4px; display: block; }
+
+        /* TOOLBAR */
+        .toolbar { display: flex; gap: .8rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.1rem; }
+        .toolbar input[type="search"] { flex: 1 1 220px; max-width: 340px; padding: .55rem .8rem; border: 2px solid #d5ddd8; border-radius: 10px; font: inherit; }
+        .toolbar select { padding: .5rem .7rem; border: 2px solid #d5ddd8; border-radius: 10px; font: inherit; background: #fff; }
+        .btn { display: inline-block; background: var(--accent); color: var(--primary-dark); padding: .55rem 1.2rem; border-radius: 50px; font-weight: 700; border: none; cursor: pointer; font-size: .92rem; }
+        .btn-ghost { background: #fff; border: 2px solid var(--primary); color: var(--primary); }
+
+        /* APPS TABLE */
+        .apps td { white-space: normal; vertical-align: top; }
+        .apps .ref { font-weight: 700; font-size: .86rem; }
+        .apps .who b { display: block; }
+        .apps .who span { color: var(--muted); font-size: .84rem; }
+        .status { display: inline-block; padding: .18rem .65rem; border-radius: 50px; font-size: .78rem; font-weight: 700; }
+        .status-pending { background: #fff4d6; color: #8a6400; }
+        .status-review { background: #e3ecff; color: #1d4fb8; }
+        .status-accepted { background: #e7f2ec; color: #0b8457; }
+        .status-waitlist { background: #f3e8ff; color: #6b21a8; }
+        .status-declined { background: #fdeaea; color: #9c1c14; }
+        .row-actions { display: flex; gap: .4rem; flex-wrap: wrap; }
+        .row-actions select { font-size: .82rem; padding: .3rem .45rem; border-radius: 8px; border: 1.5px solid #d5ddd8; }
+        .row-actions button { border: 1.5px solid #d5ddd8; background: #fff; border-radius: 8px; font-size: .82rem; padding: .3rem .55rem; cursor: pointer; color: var(--danger); }
+        .empty { text-align: center; color: var(--muted); padding: 2.5rem 1rem; }
+
+        footer { text-align: center; color: var(--muted); font-size: .84rem; padding: 2rem 0 2.5rem; }
+
+        @media print {
+            header, .toolbar, .row-actions, footer, .no-print { display: none !important; }
+            body { background: #fff; }
+            .panel { box-shadow: none; border: 1px solid #ccc; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="brand">
+            <img src="images/child-sports.jpg" alt="">
+            Tshovani Staff
+        </div>
+        <nav>
+            <a href="index.html">Website</a>
+            <a href="enroll.html">Enroll Page</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>Enrollment Dashboard</h1>
+        <p class="sub">Applications are stored on this device (browser storage). Export to CSV regularly to keep records safe.</p>
+
+        <div class="stats-row" id="stats-row"><!-- JS --></div>
+
+        <div class="panel">
+            <h2>Places by grade</h2>
+            <table id="grade-table">
+                <thead><tr><th>Grade</th><th>Ages</th><th>Capacity</th><th>Taken</th><th>Pending</th><th>Remaining</th><th style="width:160px">Fill</th></tr></thead>
+                <tbody><!-- JS --></tbody>
+            </table>
+        </div>
+
+        <div class="panel">
+            <h2>Applications</h2>
+            <div class="toolbar">
+                <input type="search" id="q" placeholder="Search name, ref, guardian, phone…" aria-label="Search applications">
+                <select id="f-grade" aria-label="Filter by grade"><option value="">All grades</option></select>
+                <select id="f-status" aria-label="Filter by status"><option value="">All statuses</option></select>
+                <button class="btn" id="export">⬇ Export CSV</button>
+                <button class="btn btn-ghost" id="print">🖨 Print list</button>
+            </div>
+            <table class="apps">
+                <thead><tr><th>Ref</th><th>Learner</th><th>Grade</th><th>Guardian</th><th>Submitted</th><th>Status</th><th>Manage</th></tr></thead>
+                <tbody id="apps-body"><!-- JS --></tbody>
+            </table>
+            <div class="empty" id="empty" hidden>No applications match your filters.</div>
+        </div>
+    </main>
+
+    <footer>Tshovani Primary School · internal use · data stays on this device until exported</footer>
+
+    <script src="app.js"></script>
+    <script>
+        TSHOVANI.seedDemo();
+        const $ = id => document.getElementById(id);
+
+        const statusOptions = TSHOVANI.STATUSES.map(s =>
+            `<option value="${s}">${s[0].toUpperCase() + s.slice(1)}</option>`).join('');
+
+        function renderStats() {
+            const s = TSHOVANI.summary();
+            const cards = [
+                ['Total applications', s.total, ''],
+                ['Awaiting review', s.byStatus.pending, 'warn'],
+                ['In review', s.byStatus.review, 'warn'],
+                ['Accepted', s.byStatus.accepted, 'good'],
+                ['Waitlisted', s.byStatus.waitlist, 'warn'],
+            ];
+            $('stats-row').innerHTML = cards.map(([label, val, cls]) =>
+                `<div class="stat-card ${cls}"><b>${val}</b><span>${label}</span></div>`).join('');
+        }
+
+        function renderGrades() {
+            const stats = TSHOVANI.gradeStats();
+            $('grade-table').querySelector('tbody').innerHTML = stats.map(g => {
+                const pct = Math.min(100, Math.round(g.taken / g.places * 100));
+                return `<tr>
+                    <td><strong>${g.name}</strong></td>
+                    <td>${g.ages}</td>
+                    <td>${g.places}</td>
+                    <td>${g.taken}</td>
+                    <td>${g.pending}</td>
+                    <td>${g.remaining <= 0 ? '<span class="status status-declined">Full</span>' : g.remaining}</td>
+                    <td><span class="bar"><i style="width:${pct}%"></i></span></td>
+                </tr>`;
+            }).join('');
+        }
+
+        function appRow(a) {
+            const date = a.createdAt.slice(0, 10);
+            return `<tr>
+                <td class="ref">${a.ref}</td>
+                <td class="who"><b>${a.learner.firstName} ${a.learner.lastName}</b><span>${a.learner.gender}, DOB ${a.learner.dob}${a.learner.notes ? ' · ' + a.learner.notes : ''}</span></td>
+                <td>${TSHOVANI.gradeName(a.learner.grade)}</td>
+                <td class="who"><b>${a.guardian.name}</b><span>${a.guardian.phone}${a.guardian.email ? ' · ' + a.guardian.email : ''} (${a.guardian.relation})</span></td>
+                <td>${date}</td>
+                <td><span class="status status-${a.status}">${a.status}</span></td>
+                <td>
+                    <div class="row-actions">
+                        <select data-act="status" data-ref="${a.ref}" aria-label="Change status for ${a.ref}">${statusOptions}</select>
+                        <button data-act="del" data-ref="${a.ref}" aria-label="Delete ${a.ref}" title="Delete">✕</button>
+                    </div>
+                </td>
+            </tr>`;
+        }
+
+        let filtered = [];
+        function renderApps() {
+            const q = $('q').value.trim().toLowerCase();
+            const fg = $('f-grade').value;
+            const fs = $('f-status').value;
+            filtered = TSHOVANI.all().filter(a => {
+                if (fg && a.learner.grade !== fg) return false;
+                if (fs && a.status !== fs) return false;
+                if (q) {
+                    const hay = `${a.ref} ${a.learner.firstName} ${a.learner.lastName} ${a.guardian.name} ${a.guardian.phone} ${a.guardian.email}`.toLowerCase();
+                    if (!hay.includes(q)) return false;
+                }
+                return true;
+            }).sort((x, y) => y.createdAt.localeCompare(x.createdAt));
+
+            $('apps-body').innerHTML = filtered.map(appRow).join('');
+            $('empty').hidden = filtered.length > 0;
+            $('apps-body').querySelectorAll('select[data-act="status"]').forEach(sel => {
+                const app = TSHOVANI.byRef(sel.dataset.ref);
+                sel.value = app ? app.status : 'pending';
+            });
+        }
+
+        $('apps-body').addEventListener('change', e => {
+            const sel = e.target.closest('select[data-act="status"]');
+            if (sel && TSHOVANI.setStatus(sel.dataset.ref, sel.value)) {
+                renderApps(); renderStats(); renderGrades();
+            }
+        });
+        $('apps-body').addEventListener('click', e => {
+            const btn = e.target.closest('button[data-act="del"]');
+            if (!btn) return;
+            if (confirm(`Delete application ${btn.dataset.ref}? This cannot be undone.`)) {
+                TSHOVANI.remove(btn.dataset.ref);
+                renderApps(); renderStats(); renderGrades();
+            }
+        });
+
+        ['q', 'f-grade', 'f-status'].forEach(id => $(id).addEventListener('input', renderApps));
+        $('export').addEventListener('click', () => TSHOVANI.downloadCSV(filtered));
+        $('print').addEventListener('click', () => window.print());
+
+        // init selects
+        $('f-grade').innerHTML += TSHOVANI.GRADES.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
+        $('f-status').innerHTML += TSHOVANI.STATUSES.map(s => `<option value="${s}">${s[0].toUpperCase() + s.slice(1)}</option>`).join('');
+
+        renderStats(); renderGrades(); renderApps();
+    </script>
+</body>
+</html>
