@@ -277,5 +277,5 @@ const TSHOVANI = (() => {
     localStorage.setItem(SESSIONS_KEY, '1');
   }
 
-  return { GRADES, STATUSES, gradeById, gradeName, validate, all, allLocal, byRef, setStatus, remove, gradeStats, summary, toCSV, downloadCSV, seedDemo, isServer: () => SERVER_MODE === true, detectServer };
+  return { GRADES, STATUSES, gradeById, gradeName, validate, createApplication, all, allLocal, byRef, setStatus, remove, gradeStats, summary, toCSV, downloadCSV, seedDemo, isServer: () => SERVER_MODE === true, detectServer };
 })();
