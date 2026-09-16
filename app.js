@@ -14,7 +14,11 @@ const TSHOVANI = (() => {
     if (SERVER_MODE !== null) return SERVER_MODE;
     try {
       const r = await fetch('/api/stats', { method: 'GET' });
-      SERVER_MODE = r.ok;
+      // 404/405 = no backend on this host → localStorage demo mode.
+      // 200 = healthy. 5xx = a backend exists but its database is down:
+      // stay in server mode so submissions fail loudly instead of being
+      // silently saved into a browser the school can never read.
+      SERVER_MODE = r.ok || r.status >= 500;
     } catch { SERVER_MODE = false; }
     return SERVER_MODE;
   }
