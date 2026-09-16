@@ -25,7 +25,8 @@ Write-Host '  Stop:   press Ctrl+C here, or close this window'
 Write-Host '============================================================'
 Write-Host ''
 
-$listener = New-Object System.Net.Sockets.TcpListener([System.Net.IPAddress]::Any, $Port)
+# Dual-stack listener (IPv4 + IPv6) so 'localhost' always resolves.
+$listener = [System.Net.Sockets.TcpListener]::Create($Port)
 try {
     $listener.Start()
 } catch {

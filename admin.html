@@ -6,13 +6,17 @@
     <meta name="theme-color" content="#083f28">
     <meta name="description" content="Tshovani Primary School staff dashboard — enrollment applications overview and management.">
     <title>Staff Dashboard | Tshovani Primary School</title>
-    <link rel="icon" href="images/child-sports.jpg">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #0b5d3b; --primary-dark: #083f28; --accent: #f4b400;
             --text: #2b2f2d; --muted: #5d6662; --bg: #f3f6f4; --white: #fff;
             --radius: 14px; --shadow: 0 10px 30px rgba(8,63,40,.10);
             --danger: #b3261e;
+            --font-display: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
         }
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; color: var(--text); background: var(--bg); line-height: 1.55; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%; }
@@ -29,6 +33,7 @@
         #logout { background: transparent; border: 1.5px solid rgba(255,255,255,.4); color: var(--white); border-radius: 8px; padding: .25rem .7rem; cursor: pointer; font-size: .85rem; }
         #logout:hover { border-color: var(--accent); color: var(--accent); }
 
+        h1, h2, h3, .btn { font-family: var(--font-display); }
         h1 { font-size: clamp(1.4rem, 3vw, 1.9rem); color: var(--primary); margin: 1.6rem 0 .2rem; }
         .sub { color: var(--muted); margin-bottom: 1.4rem; }
         .mode-tag { display: inline-block; font-size: .78rem; font-weight: 700; padding: .15rem .7rem; border-radius: 50px; margin-left: .5rem; vertical-align: middle; }
@@ -131,7 +136,7 @@
     <div id="dash" hidden>
         <header>
             <div class="brand">
-                <img src="images/child-sports.jpg" alt="">
+                <svg viewBox="0 0 64 64" aria-hidden="true" style="width:36px;height:36px"><path d="M32 3 56 10v22c0 15-10 24-24 29C18 56 8 47 8 32V10Z" fill="#f4b400"/><path d="M32 8 51 13.5V32c0 12-8 19.5-19 23.5C21 51.5 13 44 13 32V13.5Z" fill="#0b5d3b"/><path d="M32 22c-3-2.4-7.2-2.6-11-1v20c3.8-1.6 8-1.4 11 1 3-2.4 7.2-2.6 11-1V21c-3.8-1.6-8-1.4-11 1Z" fill="#ffffff"/><path d="M32 22v20" stroke="#0b5d3b" stroke-width="1.6"/><circle cx="32" cy="15.5" r="3.4" fill="#f4b400"/></svg>
                 Tshovani Staff
             </div>
             <nav>

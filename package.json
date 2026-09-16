@@ -1,0 +1,10 @@
+{
+  "name": "tshovani-primary-site",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Tshovani Primary School website + enrollment system (static site with MongoDB-backed API)",
+  "dependencies": {
+    "mongodb": "^6.9.0"
+  }
+}

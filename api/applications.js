@@ -1,14 +1,9 @@
 // Vercel serverless function: /api/applications
-// GET  -> list applications (public submit status check uses ?ref=)
-// POST -> create an application (public)
-// PATCH-> update status (requires x-admin-token)
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY,
-  { auth: { persistSession: false } }
-);
+// GET    -> list / lookup (?ref= public status check, ?status= ?grade= ?q= admin filters)
+// POST   -> create an application (public)
+// PATCH  -> update status (requires x-admin-token)
+// DELETE -> remove (requires x-admin-token)
+import { getDb, isConfigured, COLLECTION } from './_db.js';
 
 const GRADES = ['ecd-a', 'ecd-b', 'g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'g7'];
 const STATUSES = ['pending', 'review', 'accepted', 'waitlist', 'declined'];
@@ -43,31 +38,42 @@ function refCode(count) {
   return `TSP-${new Date().getFullYear()}-${n}${r}`;
 }
 
+function checkAdmin(req) {
+  return Boolean(process.env.ADMIN_TOKEN) && req.headers['x-admin-token'] === process.env.ADMIN_TOKEN;
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'content-type, x-admin-token');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS');
   if (req.method === 'OPTIONS') return res.status(204).end();
 
+  if (!isConfigured()) {
+    return res.status(503).json({ ok: false, error: 'Database not configured (MONGODB_URI missing)' });
+  }
+
   try {
+    const col = (await getDb()).collection(COLLECTION);
+
     // ---------- LIST / LOOKUP ----------
     if (req.method === 'GET') {
       const { ref, status, grade, q } = req.query;
-      let query = supabase
-        .from('applications')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (ref) query = query.eq('ref', ref);
-      if (status) query = query.eq('status', status);
-      if (grade) query = query.eq('learner->>grade', grade);
-      if (q) query = query.or(
-        `ref.ilike.%${q}%,learner->>firstName.ilike.%${q}%,learner->>lastName.ilike.%${q}%,guardian->>name.ilike.%${q}%,guardian->>phone.ilike.%${q}%`
-      );
-
-      const { data, error } = await query.limit(500);
-      if (error) throw error;
-      return res.status(200).json({ applications: data || [] });
+      const filter = {};
+      if (ref) filter.ref = String(ref).trim();
+      if (status) filter.status = String(status);
+      if (grade) filter['learner.grade'] = String(grade);
+      if (q) {
+        const rx = { $regex: String(q).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), $options: 'i' };
+        filter.$or = [
+          { ref: rx },
+          { 'learner.firstName': rx },
+          { 'learner.lastName': rx },
+          { 'guardian.name': rx },
+          { 'guardian.phone': rx },
+        ];
+      }
+      const apps = await col.find(filter).sort({ createdAt: -1 }).limit(500).toArray();
+      return res.status(200).json({ applications: apps });
     }
 
     // ---------- CREATE (public) ----------
@@ -76,12 +82,10 @@ export default async function handler(req, res) {
       const errors = validate(d);
       if (errors.length) return res.status(400).json({ ok: false, errors });
 
-      const { count } = await supabase
-        .from('applications')
-        .select('*', { count: 'exact', head: true });
-      const ref = refCode(count || 0);
+      const count = await col.countDocuments();
+      const ref = refCode(count);
 
-      const record = {
+      const doc = {
         ref,
         status: 'pending',
         learner: {
@@ -98,38 +102,35 @@ export default async function handler(req, res) {
           email: String(d.email || '').trim(),
           relation: d.relation,
         },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
-      const { error } = await supabase.from('applications').insert(record);
-      if (error) throw error;
+      await col.insertOne(doc);
       return res.status(201).json({ ok: true, ref });
     }
 
-    // ---------- UPDATE STATUS (admin token required) ----------
+    // ---------- UPDATE STATUS (admin) ----------
     if (req.method === 'PATCH') {
-      if (!process.env.ADMIN_TOKEN || req.headers['x-admin-token'] !== process.env.ADMIN_TOKEN) {
-        return res.status(401).json({ ok: false, error: 'Unauthorized' });
-      }
+      if (!checkAdmin(req)) return res.status(401).json({ ok: false, error: 'Unauthorized' });
       const d = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
       if (!d.ref || !STATUSES.includes(d.status)) {
         return res.status(400).json({ ok: false, error: 'ref and valid status required' });
       }
-      const { error } = await supabase
-        .from('applications')
-        .update({ status: d.status, updated_at: new Date().toISOString() })
-        .eq('ref', d.ref);
-      if (error) throw error;
+      const r = await col.updateOne(
+        { ref: String(d.ref) },
+        { $set: { status: d.status, updatedAt: new Date().toISOString() } }
+      );
+      if (r.matchedCount === 0) return res.status(404).json({ ok: false, error: 'Application not found' });
       return res.status(200).json({ ok: true });
     }
 
-    // ---------- DELETE (admin token required) ----------
+    // ---------- DELETE (admin) ----------
     if (req.method === 'DELETE') {
-      if (!process.env.ADMIN_TOKEN || req.headers['x-admin-token'] !== process.env.ADMIN_TOKEN) {
-        return res.status(401).json({ ok: false, error: 'Unauthorized' });
-      }
+      if (!checkAdmin(req)) return res.status(401).json({ ok: false, error: 'Unauthorized' });
       const ref = (req.query.ref || '').trim();
       if (!ref) return res.status(400).json({ ok: false, error: 'ref query param required' });
-      const { error } = await supabase.from('applications').delete().eq('ref', ref);
-      if (error) throw error;
+      const r = await col.deleteOne({ ref });
+      if (r.deletedCount === 0) return res.status(404).json({ ok: false, error: 'Application not found' });
       return res.status(200).json({ ok: true });
     }
 

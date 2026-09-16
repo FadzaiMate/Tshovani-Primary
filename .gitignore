@@ -1,6 +1,9 @@
 # Freebuff workspace metadata
 .freebuff/
 
+# Node
+node_modules/
+
 # Vercel CLI login scratch files
 vercel-login.*
 
@@ -8,5 +11,8 @@ vercel-login.*
 Thumbs.db
 desktop.ini
 
-.vercel
+
+# Secrets / local env
+.vercel/
 .env.local
+.env*.local

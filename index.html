@@ -7,7 +7,10 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="description" content="Tshovani Primary School in Chiredzi, Zimbabwe — quality primary education for every child. ECD to Grade 7, sport, arts and a caring community.">
     <title>Tshovani Primary School | Chiredzi</title>
-    <link rel="icon" href="images/child-sports.jpg">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
@@ -23,6 +26,7 @@
             --radius: 14px;
             --shadow: 0 10px 30px rgba(8, 63, 40, 0.10);
             --shadow-lg: 0 24px 60px rgba(8, 63, 40, 0.18);
+            --font-display: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
         }
 
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -47,6 +51,28 @@
             outline-offset: 2px;
         }
 
+        h1, h2, h3, .logo-text, .btn, .badge, .stat b { font-family: var(--font-display); }
+
+        /* ANNOUNCEMENT RIBBON */
+        .ribbon {
+            display: block; text-align: center; padding: 0.5rem 5%;
+            background: var(--accent); color: var(--primary-dark);
+            font-size: 0.9rem; font-weight: 600;
+            box-shadow: inset 0 -3px 0 rgba(8, 63, 40, 0.15);
+        }
+        .ribbon b { font-weight: 800; }
+        .ribbon:hover span { transform: translateX(3px); }
+        .ribbon span { display: inline-block; transition: transform 0.2s ease; }
+
+        /* SECTION KICKERS */
+        .kicker {
+            display: table; margin: 0 auto 0.9rem; padding: 0.28rem 0.95rem;
+            background: rgba(244, 180, 0, 0.16); color: #8a6800;
+            border-radius: 50px; font-size: 0.75rem; font-weight: 700;
+            letter-spacing: 0.14em; text-transform: uppercase;
+        }
+        .about-copy .kicker { margin-left: 0; }
+
         .container { max-width: var(--max-width); margin: 0 auto; padding: 0 5%; }
 
         /* HEADER */
@@ -67,11 +93,10 @@
             box-shadow: 0 2px 14px rgba(0, 0, 0, 0.18);
         }
 
-        .logo { display: flex; align-items: center; gap: 0.7rem; font-weight: 700; font-size: 1.15rem; color: var(--white); }
-        .logo-mark {
-            width: 44px; height: 44px; border-radius: 50%;
-            object-fit: cover; border: 3px solid var(--accent); flex-shrink: 0;
-        }
+        .logo { display: flex; align-items: center; gap: 0.7rem; color: var(--white); }
+        .logo-crest { width: 46px; height: 46px; flex-shrink: 0; filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3)); }
+        .logo-text { font-weight: 700; font-size: 1.12rem; line-height: 1.15; display: flex; flex-direction: column; }
+        .logo-text small { font-size: 0.68rem; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent-soft); }
 
         nav ul { display: flex; gap: 1.4rem; list-style: none; align-items: center; }
         nav a { color: var(--white); font-weight: 500; padding: 0.4rem 0.1rem; position: relative; }
@@ -80,6 +105,7 @@
             width: 0; height: 2px; background: var(--accent); transition: width 0.25s ease;
         }
         nav a:hover::after, nav a:focus-visible::after { width: 100%; }
+        nav a.active::after { width: 100%; }
 
         .menu-toggle {
             display: none; background: transparent; cursor: pointer;
@@ -100,7 +126,9 @@
             content: ""; position: absolute; inset: 0; z-index: -1;
             background: linear-gradient(180deg, rgba(8, 63, 40, 0.72), rgba(8, 63, 40, 0.55) 45%, rgba(8, 63, 40, 0.85));
         }
-        .hero-inner { padding: clamp(5rem, 12vw, 8rem) 5% calc(clamp(5rem, 12vw, 8rem) + 70px); max-width: 820px; }
+        .hero-wave { position: absolute; left: 0; right: 0; bottom: -1px; z-index: 1; line-height: 0; }
+        .hero-wave svg { width: 100%; height: clamp(45px, 7vw, 85px); display: block; }
+        .hero-inner { padding: clamp(5rem, 12vw, 8rem) 5% calc(clamp(5rem, 12vw, 8rem) + 95px); max-width: 820px; }
         .hero h1 {
             font-size: clamp(2.1rem, 6vw, 3.6rem); line-height: 1.12; letter-spacing: -0.02em;
             margin-bottom: 1rem; text-shadow: 0 2px 18px rgba(0, 0, 0, 0.35);
@@ -197,6 +225,14 @@
             opacity: 0; transition: opacity 0.3s ease;
         }
         .gallery figure:hover figcaption, .gallery figure:focus-visible figcaption { opacity: 1; }
+        .gallery figure::after {
+            content: "⤢"; position: absolute; top: 0.7rem; right: 0.7rem;
+            width: 2rem; height: 2rem; display: grid; place-items: center;
+            background: rgba(255, 255, 255, 0.92); color: var(--primary-dark);
+            border-radius: 50%; font-size: 0.85rem; opacity: 0;
+            transition: opacity 0.3s ease; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+        .gallery figure:hover::after, .gallery figure:focus-visible::after { opacity: 1; }
 
         /* LIGHTBOX */
         .lightbox {
@@ -204,13 +240,19 @@
             background: rgba(5, 24, 16, 0.92); padding: 2rem;
         }
         .lightbox.open { display: grid; place-items: center; }
-        .lightbox img { max-width: min(1100px, 92vw); max-height: 82vh; border-radius: var(--radius); box-shadow: var(--shadow-lg); }
-        .lightbox .lb-close {
-            position: absolute; top: 1.2rem; right: 1.4rem; background: rgba(255,255,255,0.12);
-            color: var(--white); border: none; font-size: 1.6rem; line-height: 1;
-            width: 2.6rem; height: 2.6rem; border-radius: 50%; cursor: pointer;
+        .lightbox img { max-width: min(1100px, 92vw); max-height: 78vh; border-radius: var(--radius); box-shadow: var(--shadow-lg); }
+        .lightbox .lb-btn {
+            position: absolute; background: rgba(255,255,255,0.12); color: var(--white);
+            border: 1px solid rgba(255,255,255,0.3); border-radius: 50%;
+            font-size: 1.5rem; line-height: 1; width: 2.8rem; height: 2.8rem;
+            display: grid; place-items: center; cursor: pointer; transition: background 0.2s ease;
         }
+        .lightbox .lb-btn:hover { background: rgba(255,255,255,0.28); }
+        .lightbox .lb-close { top: 1.2rem; right: 1.4rem; }
+        .lightbox .lb-prev { top: 50%; left: 1.2rem; transform: translateY(-50%); }
+        .lightbox .lb-next { top: 50%; right: 1.2rem; transform: translateY(-50%); }
         .lightbox .lb-cap { color: rgba(255,255,255,0.9); text-align: center; margin-top: 0.9rem; font-size: 0.95rem; }
+        .lightbox .lb-count { color: rgba(255,255,255,0.6); text-align: center; font-size: 0.8rem; margin-top: 0.3rem; }
 
         /* TESTIMONIALS */
         .quote-card {
@@ -232,7 +274,20 @@
             color: var(--white); text-align: center; border-radius: var(--radius);
             padding: clamp(2.4rem, 6vw, 4rem) 5%; box-shadow: var(--shadow-lg);
         }
-        .cta h2 { font-size: clamp(1.6rem, 4vw, 2.3rem); margin-bottom: 0.6rem; }
+        .cta { position: relative; overflow: hidden; }
+        .cta::before {
+            content: ""; position: absolute; top: -40%; right: -15%; width: 45%; height: 180%;
+            background: radial-gradient(closest-side, rgba(244, 180, 0, 0.22), transparent);
+            pointer-events: none;
+        }
+        .cta::after {
+            content: ""; position: absolute; bottom: -30%; left: -10%; width: 40%; height: 160%;
+            background: radial-gradient(closest-side, rgba(255, 255, 255, 0.10), transparent);
+            pointer-events: none;
+        }
+        .cta h2 { font-size: clamp(1.6rem, 4vw, 2.3rem); margin-bottom: 0.6rem; position: relative; }
+        .cta p { opacity: 0.92; max-width: 560px; margin: 0 auto 1.8rem; position: relative; }
+        .cta .btn { position: relative; }
         .cta p { opacity: 0.92; max-width: 560px; margin: 0 auto 1.8rem; }
 
         /* CONTACT */
@@ -247,10 +302,21 @@
         .contact-card p { color: var(--muted); }
 
         /* FOOTER */
-        footer { background: var(--primary-dark); color: rgba(255, 255, 255, 0.85); padding: 2.4rem 5% 1.8rem; font-size: 0.9rem; }
-        .footer-grid { display: flex; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; max-width: var(--max-width); margin: 0 auto 1.4rem; }
+        footer { position: relative; background: var(--primary-dark); color: rgba(255, 255, 255, 0.85); padding: clamp(2.6rem, 5vw, 3.5rem) 5% 1.8rem; font-size: 0.9rem; }
+        footer::before {
+            content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, var(--accent), rgba(244, 180, 0, 0.15) 60%, transparent);
+        }
+        .footer-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 1.5rem; flex-wrap: wrap; max-width: var(--max-width); margin: 0 auto 1.6rem; }
+        .footer-grid .col strong { display: block; color: var(--white); margin-bottom: 0.5rem; }
+        .footer-grid .col a { display: block; padding: 0.18rem 0; color: rgba(255, 255, 255, 0.8); transition: color 0.2s ease, transform 0.2s ease; }
+        .footer-grid .col a:hover { color: var(--accent-soft); transform: translateX(3px); }
+        .footer-grid .col { color: rgba(255, 255, 255, 0.75); }
         footer a { color: var(--accent); }
-        .footer-note { text-align: center; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 1.2rem; color: rgba(255,255,255,0.6); font-size: 0.8rem; }
+        .footer-note { text-align: center; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 1.2rem; color: rgba(255,255,255,0.6); font-size: 0.8rem; max-width: var(--max-width); margin: 0 auto; }
+
+        /* Sticky header shrink on scroll */
+        header.scrolled { padding-top: 0.45rem; padding-bottom: 0.45rem; box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25); }
 
         /* SCROLL REVEAL */
         .reveal { opacity: 0; transform: translateY(26px); transition: opacity 0.7s ease, transform 0.7s ease; }
@@ -261,6 +327,7 @@
             .about-grid { grid-template-columns: 1fr; }
             .stats { grid-template-columns: repeat(2, 1fr); gap: 1.4rem; }
             .gallery { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 150px; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
         }
         @media (max-width: 720px) {
             .menu-toggle { display: block; }
@@ -273,6 +340,7 @@
             .about-photos .ph-inset { right: 0; width: 58%; }
             .hero-inner { padding-bottom: calc(clamp(4rem, 12vw, 6rem) + 90px); }
             .stats-band { margin-top: -90px; }
+            .ribbon { font-size: 0.8rem; padding: 0.45rem 4%; }
         }
         @media (max-width: 480px) {
             .gallery { grid-template-columns: 1fr 1fr; grid-auto-rows: 128px; }
@@ -303,10 +371,12 @@
 </head>
 <body>
 
+    <a class="ribbon" href="enroll.html#grades">🎓 <b>2026 places available in every grade</b> — apply online in 5 minutes <span>→</span></a>
+
     <header>
         <a href="#home" class="logo" aria-label="Tshovani Primary School home">
-            <img class="logo-mark" src="images/child-sports.jpg" alt="">
-            Tshovani Primary School
+            <svg class="logo-crest" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 3 56 10v22c0 15-10 24-24 29C18 56 8 47 8 32V10Z" fill="#f4b400"/><path d="M32 8 51 13.5V32c0 12-8 19.5-19 23.5C21 51.5 13 44 13 32V13.5Z" fill="#0b5d3b"/><path d="M32 22c-3-2.4-7.2-2.6-11-1v20c3.8-1.6 8-1.4 11 1 3-2.4 7.2-2.6 11-1V21c-3.8-1.6-8-1.4-11 1Z" fill="#ffffff"/><path d="M32 22v20" stroke="#0b5d3b" stroke-width="1.6"/><circle cx="32" cy="15.5" r="3.4" fill="#f4b400"/></svg>
+            <span class="logo-text">Tshovani Primary School<small>Chiredzi · Est. 1994</small></span>
         </a>
 
         <button class="menu-toggle" aria-label="Toggle navigation menu"
@@ -341,15 +411,18 @@
                 <a href="enroll.html#grades" class="btn">Discover Our School</a>
                 <a href="enroll.html#apply" class="btn btn-outline">Enroll Today</a>
             </div>
+            <div class="hero-wave" aria-hidden="true">
+                <svg viewBox="0 0 1440 90" preserveAspectRatio="none"><path fill="#f6f8f6" d="M0 40 C 240 95 480 0 720 35 C 960 70 1200 15 1440 50 L1440 90 L0 90 Z"/></svg>
+            </div>
         </section>
 
         <!-- STATS -->
         <div class="stats-band container">
             <div class="stats reveal">
-                <div class="stat"><b data-count="640">0</b><span>Learners enrolled</span></div>
+                <div class="stat"><b data-count="640" data-suffix="+">0</b><span>Learners enrolled</span></div>
                 <div class="stat"><b data-count="24">0</b><span>Dedicated teachers</span></div>
                 <div class="stat"><b>1:26</b><span>Teacher-to-pupil care</span></div>
-                <div class="stat"><b data-count="32">0</b><span>Years serving Chiredzi</span></div>
+                <div class="stat"><b data-count="32" data-suffix=" yrs">0</b><span>Years serving Chiredzi</span></div>
             </div>
         </div>
 
@@ -361,6 +434,7 @@
                     <img class="ph-inset" src="images/early-years.jpg" alt="Young learners smiling together outdoors">
                 </div>
                 <div class="about-copy reveal">
+                    <p class="kicker">Who we are</p>
                     <h2 class="section-title">About Our School</h2>
                     <p>Tshovani Primary School has been part of the Chiredzi community for over three decades. We blend solid academics with sport, culture, and care — because a child who is happy, safe, and curious learns best.</p>
                     <ul class="checklist">
@@ -377,6 +451,7 @@
         <!-- PROGRAMS -->
         <section id="programs" style="background:var(--white);">
             <div class="container">
+                <p class="kicker">Learning</p>
                 <h2 class="section-title">Our Programs</h2>
                 <p class="section-sub">Every child finds something to love — and something to be great at.</p>
                 <div class="grid">
@@ -415,6 +490,7 @@
         <!-- GALLERY -->
         <section id="gallery">
             <div class="container">
+                <p class="kicker">Gallery</p>
                 <h2 class="section-title">Life at Tshovani</h2>
                 <p class="section-sub">A glimpse of everyday joy on our grounds. Click any photo to view it full size.</p>
                 <div class="gallery reveal">
@@ -449,6 +525,7 @@
         <!-- TESTIMONIALS -->
         <section id="voices" style="background:var(--white);">
             <div class="container">
+                <p class="kicker">Testimonials</p>
                 <h2 class="section-title">What Families Say</h2>
                 <p class="section-sub">The trust of Chiredzi parents is our proudest result.</p>
                 <div class="grid">
@@ -482,6 +559,7 @@
         <!-- CONTACT -->
         <section id="contact" style="padding-top:0.5rem;">
             <div class="container">
+                <p class="kicker">Get in touch</p>
                 <h2 class="section-title">Contact Us</h2>
                 <p class="section-sub">We are easy to reach — and always happy to show parents around.</p>
                 <div class="grid">
@@ -507,13 +585,25 @@
 
     <footer>
         <div class="footer-grid">
-            <div>
-                <strong>Tshovani Primary School</strong><br>
-                Nurturing bright futures in Chiredzi since 1994.
+            <div class="col">
+                <strong>Tshovani Primary School</strong>
+                Nurturing bright futures in Chiredzi since 1994.<br><br>
+                Tshovani, Chiredzi District<br>Masvingo Province, Zimbabwe<br>
+                <a href="mailto:info@tshovaniprimary.co.zw">info@tshovaniprimary.co.zw</a>
             </div>
-            <div>
-                <strong>Quick links</strong><br>
-                <a href="#about">About</a> · <a href="#programs">Programs</a> · <a href="#gallery">Gallery</a> · <a href="#contact">Contact</a>
+            <div class="col">
+                <strong>School</strong>
+                <a href="#about">About us</a>
+                <a href="#programs">Programs</a>
+                <a href="#gallery">Gallery</a>
+                <a href="#voices">Testimonials</a>
+            </div>
+            <div class="col">
+                <strong>Enrollment</strong>
+                <a href="enroll.html#grades">Grades &amp; places</a>
+                <a href="enroll.html#apply">Apply online</a>
+                <a href="admin.html">Staff portal</a>
+                <a href="#contact">Contact us</a>
             </div>
         </div>
         <div class="footer-note">
@@ -524,10 +614,13 @@
 
     <!-- LIGHTBOX -->
     <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer">
-        <button class="lb-close" aria-label="Close image viewer">✕</button>
+        <button class="lb-btn lb-close" aria-label="Close image viewer">✕</button>
+        <button class="lb-btn lb-prev" aria-label="Previous image">‹</button>
+        <button class="lb-btn lb-next" aria-label="Next image">›</button>
         <div>
             <img id="lb-img" src="" alt="">
             <div class="lb-cap" id="lb-cap"></div>
+            <div class="lb-count" id="lb-count"></div>
         </div>
     </div>
 
@@ -543,6 +636,26 @@
             nav.classList.remove('open');
             toggle.setAttribute('aria-expanded', 'false');
         }));
+
+        // Sticky header shrink
+        const headerEl = document.querySelector('header');
+        addEventListener('scroll', () => {
+            headerEl.classList.toggle('scrolled', scrollY > 30);
+        }, { passive: true });
+
+        // Nav scrollspy — highlight the section in view
+        const spyLinks = [...document.querySelectorAll('nav a[href^="#"]')];
+        const spySections = spyLinks
+            .map(a => document.querySelector(a.getAttribute('href')))
+            .filter(Boolean);
+        const spy = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (!e.isIntersecting) return;
+                spyLinks.forEach(a => a.classList.toggle('active',
+                    a.getAttribute('href') === '#' + e.target.id));
+            });
+        }, { rootMargin: '-40% 0px -55% 0px' });
+        spySections.forEach(s => spy.observe(s));
 
         // Footer year
         document.getElementById('year').textContent = new Date().getFullYear();
@@ -570,25 +683,41 @@
         }, { threshold: 0.6 });
         counters.forEach(c => cio.observe(c));
 
-        // Gallery lightbox
+        // Gallery lightbox with prev/next navigation
         const lb = document.getElementById('lightbox');
         const lbImg = document.getElementById('lb-img');
         const lbCap = document.getElementById('lb-cap');
-        document.querySelectorAll('.gallery figure').forEach(f => {
-            const open = () => {
-                lbImg.src = f.dataset.full;
-                lbImg.alt = f.querySelector('img').alt;
-                lbCap.textContent = f.querySelector('figcaption').textContent;
-                lb.classList.add('open');
-                document.body.style.overflow = 'hidden';
-            };
-            f.addEventListener('click', open);
-            f.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
-        });
+        const lbCount = document.getElementById('lb-count');
+        const figures = [...document.querySelectorAll('.gallery figure')];
+        let lbIndex = 0;
+        const showFig = i => {
+            lbIndex = (i + figures.length) % figures.length;
+            const f = figures[lbIndex];
+            lbImg.src = f.dataset.full;
+            lbImg.alt = f.querySelector('img').alt;
+            lbCap.textContent = f.querySelector('figcaption').textContent;
+            lbCount.textContent = (lbIndex + 1) + ' / ' + figures.length;
+        };
+        const openLb = f => {
+            showFig(figures.indexOf(f));
+            lb.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        };
         const closeLb = () => { lb.classList.remove('open'); document.body.style.overflow = ''; };
+        figures.forEach(f => {
+            f.addEventListener('click', () => openLb(f));
+            f.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLb(f); } });
+        });
         lb.querySelector('.lb-close').addEventListener('click', closeLb);
+        lb.querySelector('.lb-prev').addEventListener('click', () => showFig(lbIndex - 1));
+        lb.querySelector('.lb-next').addEventListener('click', () => showFig(lbIndex + 1));
         lb.addEventListener('click', e => { if (e.target === lb) closeLb(); });
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLb(); });
+        document.addEventListener('keydown', e => {
+            if (!lb.classList.contains('open')) return;
+            if (e.key === 'Escape') closeLb();
+            if (e.key === 'ArrowLeft') showFig(lbIndex - 1);
+            if (e.key === 'ArrowRight') showFig(lbIndex + 1);
+        });
     </script>
 </body>
 </html>

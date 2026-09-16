@@ -16,12 +16,15 @@ Plain HTML/CSS/JS. No build step, no frameworks.
 
 ## How the data works
 
-- **Deployed (Vercel):** applications are stored in Supabase (Postgres) via
-  serverless functions in `api/`. Every parent application reaches the same
-  dashboard. Status changes and deletions require the staff PIN (admin token).
-- **Local (opened without the API):** the same pages fall back to
-  `localStorage` on that browser and seed 5 demo applications, so everything
-  is testable offline. The dashboard shows a "Local demo mode" tag.
+Applications are stored in **MongoDB Atlas** (free cluster) through the
+serverless functions in `api/`. Every parent application — from any device —
+lands in the same database and appears in the staff dashboard. Status changes
+and deletions require the staff PIN (admin token).
+
+If the API is unreachable or the database is not configured (e.g. opening the
+files straight from disk), the same pages fall back to `localStorage` on that
+browser and seed 5 demo applications, so everything stays testable offline.
+The dashboard shows a "Local demo mode" tag in that case.
 
 `app.js` picks the mode automatically by probing `/api/stats`.
 
@@ -40,19 +43,18 @@ Then open http://localhost:8000 · staff dashboard at /admin.html (local PIN: **
 
 ## Deploy to Vercel (with the real backend)
 
-1. **Create the database (once, free):**
-   - Create a project at [supabase.com](https://supabase.com)
-   - SQL Editor → paste `api/schema.sql` → Run
-   - Copy from Project Settings → API: the **Project URL** and the
-     **service_role key** (keep it secret!)
+1. **Database (done):** MongoDB Atlas free cluster. The connection string
+   lives in `.env.local` (gitignored) as `MONGODB_URI`. In Atlas:
+   Database Access → user `matefadzai02_db_user` · Network Access → allow
+   `0.0.0.0/0` (or Vercel's IPs). Collections are created on first write —
+   no setup script needed.
 2. **Deploy & configure (once):**
    ```bash
    npm i -g vercel
    vercel login
    vercel link
-   vercel env add SUPABASE_URL          # paste the Project URL
-   vercel env add SUPABASE_SERVICE_KEY  # paste the service key
-   vercel env add ADMIN_TOKEN           # choose the staff PIN, e.g. 0413
+   vercel env add MONGODB_URI   # paste the full connection string (with the real password)
+   vercel env add ADMIN_TOKEN   # choose the staff PIN, e.g. 0413
    vercel --prod
    ```
 3. **Auto-deploy:** in the Vercel dashboard open the project →

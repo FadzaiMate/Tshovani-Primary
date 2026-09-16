@@ -1,12 +1,6 @@
 // Vercel serverless function: /api/stats
 // Public per-grade fill counts + overall summary for the dashboard.
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY,
-  { auth: { persistSession: false } }
-);
+import { getDb, isConfigured, COLLECTION } from './_db.js';
 
 const GRADES = [
   { id: 'ecd-a', name: 'ECD A', ages: '3–4 yrs', fee: 20, places: 25 },
@@ -27,24 +21,36 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(204).end();
   if (req.method !== 'GET') return res.status(405).json({ ok: false, error: 'Method not allowed' });
 
-  try {
-    const { data, error } = await supabase
-      .from('applications')
-      .select('status, learner->>grade as grade');
-    if (error) throw error;
+  if (!isConfigured()) {
+    return res.status(503).json({ ok: false, error: 'Database not configured (MONGODB_URI missing)' });
+  }
 
-    const rows = data || [];
+  try {
+    const col = (await getDb()).collection(COLLECTION);
+
+    // One aggregation: counts per (status, grade)
+    const rows = await col.aggregate([
+      { $group: { _id: { status: '$status', grade: '$learner.grade' }, n: { $sum: 1 } } },
+    ]).toArray();
+
+    const count = (status, grade) =>
+      rows.find(r => r._id.status === status && r._id.grade === grade)?.n || 0;
+
     const gradeStats = GRADES.map(g => {
-      const mine = rows.filter(r => r.grade === g.id);
-      const taken = mine.filter(r => r.status !== 'declined').length;
-      const pending = mine.filter(r => r.status === 'pending' || r.status === 'review').length;
+      const mine = rows.filter(r => r._id.grade === g.id);
+      const total = mine.reduce((s, r) => s + r.n, 0);
+      const declined = count('declined', g.id);
+      const taken = total - declined;
+      const pending = count('pending', g.id) + count('review', g.id);
       return { ...g, taken, pending, remaining: Math.max(g.places - taken, 0) };
     });
 
     const byStatus = {};
-    STATUSES.forEach(s => { byStatus[s] = rows.filter(r => r.status === s).length; });
+    STATUSES.forEach(s => {
+      byStatus[s] = rows.filter(r => r._id.status === s).reduce((sum, r) => sum + r.n, 0);
+    });
 
-    return res.status(200).json({ gradeStats, summary: { total: rows.length, byStatus } });
+    return res.status(200).json({ gradeStats, summary: { total: byStatus && Object.values(byStatus).reduce((a, b) => a + b, 0), byStatus } });
   } catch (err) {
     console.error('stats API error:', err);
     return res.status(500).json({ ok: false, error: 'Server error' });
